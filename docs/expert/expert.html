@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Nix Options Editor</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js"></script>
+    <script src="schema_mid.js"></script>
+    <script src="schema_full.js"></script>
+    
+    <script>
+    // Set the default CSS theme and icon library globally
+    JSONEditor.defaults.theme = 'spectre';
+    JSONEditor.defaults.iconlib = 'spectre';
+    </script>
+    <style>
+      .container {
+        max-width:960px;
+        margin: 0 auto
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Nix Options Editor</h1>
+    
+    <button id='submit'>Submit (console.log)</button>
+    <button id='restore'>Restore to Default</button>
+    <button id='enable_disable'>Disable/Enable Form</button>
+    <span id='valid_indicator'></span>
+    
+    <div id='editor_holder'></div>
+    
+    <script>
+      var starting_value = []
+      
+      var editor = new JSONEditor(document.getElementById('editor_holder'),{
+        disable_properties: true,
+        disable_edit_json: true,
+	disable_array_delete_last_row: true,
+	disable_array_delete_all_rows: true,
+	prompt_before_delete: false,
+        schema: {
+          type: "object",
+          title: "Nix Options",
+          options : {
+              collapsed : false,
+	      disable_collapse : true
+	  },
+	  properties : {
+              myOptions : schema_mid
+//              myOptions : schema_full
+	  }          
+        },
+        
+        startval: starting_value,
+        
+        // Disable additional properties
+        no_additional_properties: true,
+        
+        // Require all properties by default
+        required_by_default: true
+      });
+      
+      // Hook up the submit button to log to the console
+      document.getElementById('submit').addEventListener('click',function() {
+        // Get the value from the editor
+        console.log(editor.getValue());
+      });
+      
+      // Hook up the Restore to Default button
+      document.getElementById('restore').addEventListener('click',function() {
+        editor.setValue(starting_value);
+      });
+      
+      // Hook up the enable/disable button
+      document.getElementById('enable_disable').addEventListener('click',function() {
+        // Enable form
+        if(!editor.isEnabled()) {
+          editor.enable();
+        }
+        // Disable form
+        else {
+          editor.disable();
+        }
+      });
+      
+      // Hook up the validation indicator to update its 
+      // status whenever the editor changes
+      editor.on('change',function() {
+        // Get an array of errors from the validator
+        var errors = editor.validate();
+        
+        var indicator = document.getElementById('valid_indicator');
+        
+        // Not valid
+        if(errors.length) {
+          indicator.style.color = 'red';
+          indicator.textContent = "not valid";
+        }
+        // Valid
+        else {
+          indicator.style.color = 'green';
+          indicator.textContent = "valid";
+        }
+      });
+    </script>
+  </body>
+</html>

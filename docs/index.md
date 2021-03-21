@@ -4,6 +4,6 @@ Setup and configure one of the following applications online and download a read
 
 ## DMRHost
 
-### Easy Mode
+### [Easy Mode](easy/easy.html)
 
-### Expert Mode
+### [Expert Mode](expert/expert.html)
